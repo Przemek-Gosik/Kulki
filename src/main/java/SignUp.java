@@ -23,17 +23,17 @@ public class SignUp {
 
     public SignUp(JFrame jFrame) {
         this.jFrame = jFrame;
-        registerButton.addActionListener(e -> {
-            String login = textField1.getText();
-            String pass1 = String.valueOf(passwordField1.getPassword());
-            String pass2 = String.valueOf(passwordField2.getPassword());
+        this.registerButton.addActionListener(e -> {
+            String login = this.textField1.getText();
+            String pass1 = String.valueOf(this.passwordField1.getPassword());
+            String pass2 = String.valueOf(this.passwordField2.getPassword());
             if (validateUsername(login) && validatePassword(pass1, pass2)) {
                 User user = new User(login, pass1);
                 try {
 
                     DBOperations.addToDatabase(user);
-                    jFrame.getContentPane().removeAll();
-                    FirstMenu firstMenu = new FirstMenu(jFrame, user);
+                    this.jFrame.getContentPane().removeAll();
+                    FirstMenu firstMenu = new FirstMenu(this.jFrame, user);
                 } catch (Exception exception) {
                     JOptionPane.showMessageDialog(new JFrame(), "Nie udalo sie utworzyc konta o podanym loginie, login może być już zajęty",
                             "Błąd", JOptionPane.ERROR_MESSAGE);
@@ -50,7 +50,7 @@ public class SignUp {
 
         });
         backToLoginButton.addActionListener(e -> {
-            Login loginPanel = new Login(jFrame);
+            Login loginPanel = new Login(this.jFrame);
 
         });
     }
@@ -122,4 +122,5 @@ public class SignUp {
     public JComponent $$$getRootComponent$$$() {
         return signUpPanel;
     }
+
 }
