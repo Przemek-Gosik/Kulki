@@ -1,3 +1,4 @@
+import javax.persistence.EntityManagerFactory;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -10,27 +11,28 @@ public class Login {
     private JPasswordField passwordField1;
     private JButton loginButton;
     private JButton goToRegisterButton;
+    private EntityManagerFactory managerFactory;
 
-    public Login(JFrame jFrame) {
+    public Login(JFrame jFrame, EntityManagerFactory managerFactory1) {
+        this.managerFactory = managerFactory1;
         this.frame = jFrame;
         frame.setContentPane(this.loginPanel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Dimension dimension = new Dimension(400, 200);
-        frame.setLocationRelativeTo(null);
+        //frame.setLocationRelativeTo(null);
         frame.setPreferredSize(dimension);
         frame.pack();
         frame.setVisible(true);
-        loginButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String login = textField1.getText();
-                String password = String.valueOf(passwordField1.getPassword());
-                DBOperations dbOperations = new DBOperations();
-
-                if (dbOperations.validateLogin(login, password)) {
-                    User user = dbOperations.getUser();
+        loginButton.addActionListener(e -> {
+            String login = textField1.getText();
+            String password = String.valueOf(passwordField1.getPassword());
+            DBOperations operations;
+            try {
+                operations = DBOperations.getInstance(managerFactory);
+                if (operations.validateLogin(login, password)) {
+                    User user = operations.getUser();
                     jFrame.getContentPane().removeAll();
-                    FirstMenu firstMenu = new FirstMenu(jFrame, user);
+                    new FirstMenu(jFrame, user, managerFactory);
                 } else {
                     JOptionPane.showMessageDialog(new JFrame(),
                             "Niepoprawne dane!",
@@ -38,19 +40,18 @@ public class Login {
                             JOptionPane.ERROR_MESSAGE);
 
                 }
-
-
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(new JFrame(), "Sprawdź połączenie z bazą", "Brak połączenia", JOptionPane.ERROR_MESSAGE);
             }
+
         });
-        goToRegisterButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                SignUp signUpPanel = new SignUp(jFrame);
-                jFrame.getContentPane().removeAll();
-                jFrame.setContentPane(signUpPanel.getSignUpPanel());
-                jFrame.revalidate();
-                jFrame.pack();
-            }
+        goToRegisterButton.addActionListener(e -> {
+            SignUp signUpPanel = new SignUp(jFrame, managerFactory);
+            jFrame.getContentPane().removeAll();
+            jFrame.setContentPane(signUpPanel.getSignUpPanel());
+            jFrame.revalidate();
+            jFrame.pack();
+
         });
     }
 
@@ -117,4 +118,5 @@ public class Login {
     public JComponent $$$getRootComponent$$$() {
         return loginPanel;
     }
+
 }

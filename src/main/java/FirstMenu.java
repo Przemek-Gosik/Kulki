@@ -1,3 +1,4 @@
+import javax.persistence.EntityManagerFactory;
 import javax.swing.*;
 import java.awt.*;
 
@@ -9,17 +10,19 @@ public class FirstMenu {
     private JButton changeLoginButton;
     private JButton gameListButton;
     JFrame jFrame;
+    private EntityManagerFactory managerFactory;
 
-    public FirstMenu(JFrame jFrame1, User user) {
+    public FirstMenu(JFrame jFrame1, User user, EntityManagerFactory managerFactory1) {
         this.jFrame = jFrame1;
         this.user = user;
+        this.managerFactory = managerFactory1;
         jFrame.setPreferredSize(new Dimension(400, 200));
         jFrame.setContentPane(panel1);
         jFrame.revalidate();
         jFrame.pack();
         zacznijGręButton.addActionListener(e -> {
             jFrame.getContentPane().removeAll();
-            DifficultChoice difficultChoice = new DifficultChoice(user);
+            DifficultChoice difficultChoice = new DifficultChoice(jFrame, user, managerFactory);
             jFrame.setContentPane(difficultChoice.getJpanel2());
             jFrame.setPreferredSize(new Dimension(400, 300));
             jFrame.pack();
@@ -28,7 +31,7 @@ public class FirstMenu {
         changeLoginButton.addActionListener(e -> {
 
             jFrame.getContentPane().removeAll();
-            ChangeLogin changeLogin = new ChangeLogin(jFrame, user);
+            ChangeLogin changeLogin = new ChangeLogin(jFrame, user, managerFactory);
             jFrame.setContentPane(changeLogin.getChangeLogin());
             jFrame.pack();
             jFrame.revalidate();
@@ -40,7 +43,7 @@ public class FirstMenu {
             //GameList list = new GameList(user,jFrame);
             jFrame.setPreferredSize(new Dimension(600, 300));
             //jFrame.setContentPane(list.getjPanel());
-            GList gList = new GList(jFrame, user);
+            GList gList = new GList(jFrame, user, managerFactory);
             jFrame.setContentPane(gList.getPanelList());
             jFrame.revalidate();
             jFrame.pack();
@@ -91,4 +94,5 @@ public class FirstMenu {
     public JComponent $$$getRootComponent$$$() {
         return panel1;
     }
+
 }

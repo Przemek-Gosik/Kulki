@@ -1,3 +1,4 @@
+import javax.persistence.EntityManagerFactory;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -15,21 +16,23 @@ public class GList {
     private final JFrame jFrame;
     private final DefaultTableModel tableModel;
     private final User user;
-    private final String[] columnNames = {
-            "Nr", " ", "wynik", "czas", "data", "poziom"
-    };
-    private List<Result> results;
+    private final List<Result> results;
+    private EntityManagerFactory managerFactory;
 
-    public GList(JFrame jFrame, User user) {
+    public GList(JFrame jFrame, User user, EntityManagerFactory managerFactory1) {
         this.user = user;
         this.results = user.getResults();
         this.jFrame = jFrame;
+        this.managerFactory = managerFactory1;
+        String[] columnNames = {
+                "Nr", " ", "wynik", "czas", "data", "poziom"
+        };
         this.tableModel = new DefaultTableModel(columnNames, 0);
         initTable();
         this.table1.setModel(tableModel);
         backToMenuButton.addActionListener(e -> {
             jFrame.getContentPane().removeAll();
-            FirstMenu firstMenu = new FirstMenu(this.jFrame, this.user);
+            FirstMenu firstMenu = new FirstMenu(this.jFrame, this.user, this.managerFactory);
         });
     }
 
@@ -80,4 +83,5 @@ public class GList {
     public JComponent $$$getRootComponent$$$() {
         return jPanelList;
     }
+
 }

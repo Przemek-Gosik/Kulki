@@ -1,3 +1,4 @@
+import javax.persistence.EntityManagerFactory;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -14,6 +15,7 @@ public class SignUp {
     private JButton registerButton;
     private JPanel signUpPanel;
     private JButton backToLoginButton;
+    private EntityManagerFactory managerFactory;
 
     public JPanel getSignUpPanel() {
 
@@ -21,8 +23,9 @@ public class SignUp {
     }
 
 
-    public SignUp(JFrame jFrame) {
+    public SignUp(JFrame jFrame, EntityManagerFactory managerFactory1) {
         this.jFrame = jFrame;
+        this.managerFactory = managerFactory1;
         this.registerButton.addActionListener(e -> {
             String login = this.textField1.getText();
             String pass1 = String.valueOf(this.passwordField1.getPassword());
@@ -30,10 +33,11 @@ public class SignUp {
             if (validateUsername(login) && validatePassword(pass1, pass2)) {
                 User user = new User(login, pass1);
                 try {
-
-                    DBOperations.addToDatabase(user);
+                    DBOperations operations;
+                    operations = DBOperations.getInstance(managerFactory1);
+                    operations.addToDatabase(user);
                     this.jFrame.getContentPane().removeAll();
-                    FirstMenu firstMenu = new FirstMenu(this.jFrame, user);
+                    new FirstMenu(this.jFrame, user, managerFactory);
                 } catch (Exception exception) {
                     JOptionPane.showMessageDialog(new JFrame(), "Nie udalo sie utworzyc konta o podanym loginie, login może być już zajęty",
                             "Błąd", JOptionPane.ERROR_MESSAGE);
@@ -50,7 +54,7 @@ public class SignUp {
 
         });
         backToLoginButton.addActionListener(e -> {
-            Login loginPanel = new Login(this.jFrame);
+             new Login(this.jFrame, managerFactory);
 
         });
     }

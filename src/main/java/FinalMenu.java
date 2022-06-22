@@ -1,48 +1,46 @@
+import javax.persistence.EntityManagerFactory;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+
 
 public class FinalMenu {
     private JButton zapiszGręButton;
     private JButton backToFirstMenuButton;
-
+    private JFrame gameFrame, jFrame;
     private JLabel resultText;
     private JPanel jPanel3;
     private JLabel timeResult;
     private JButton finishButton;
     private User user;
+    private EntityManagerFactory managerFactory;
     private Result result;
-    private JFrame jFrame;
 
-    public FinalMenu(Result result, User user, JFrame jFrame) {
+
+    public FinalMenu(JFrame jFrame1, Result result, User user, EntityManagerFactory managerFactory1, JFrame gameFrame1) {
+        this.jFrame = jFrame1;
         this.result = result;
         this.user = user;
-        this.jFrame = jFrame;
+        this.managerFactory = managerFactory1;
+        this.gameFrame = gameFrame1;
         timeResult.setText(timeFormat());
         resultText.setText(Integer.toString(result.getScore()));
-        zapiszGręButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                DBOperations.addToDatabase(result);
-                DBOperations.updateUser(user, result);
-                JOptionPane.showMessageDialog(new JFrame(),
-                        "Zapisano wynik", "Sukces", JOptionPane.INFORMATION_MESSAGE);
+        zapiszGręButton.addActionListener(e -> {
+            DBOperations operations;
+            operations = DBOperations.getInstance(managerFactory);
+            operations.addToDatabase(result);
+            operations.updateUser(user, result);
+            zapiszGręButton.setEnabled(false);
+            JOptionPane.showMessageDialog(new JFrame(),
+                    "Zapisano wynik", "Sukces", JOptionPane.INFORMATION_MESSAGE);
 
-            }
+
         });
-        finishButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.exit(0);
-            }
-        });
-        backToFirstMenuButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                jFrame.getContentPane().removeAll();
-                FirstMenu firstMenu = new FirstMenu(jFrame, user);
-            }
+        finishButton.addActionListener(e -> System.exit(0));
+        backToFirstMenuButton.addActionListener(e -> {
+            gameFrame.dispose();
+            jFrame.getContentPane().removeAll();
+            new FirstMenu(jFrame, user, managerFactory);
+
         });
     }
 
@@ -57,9 +55,9 @@ public class FinalMenu {
             timePom /= 60.0;
             int min = (int) timePom;
             float sec = timePom - min;
-            sTime = Integer.toString(min) + " min " + String.valueOf(sec) + " sec";
+            sTime = min + " min " + sec + " sec";
         } else {
-            sTime = String.valueOf(timePom) + " sec";
+            sTime = timePom + " sec";
         }
         return sTime;
     }
@@ -160,4 +158,5 @@ public class FinalMenu {
     public JComponent $$$getRootComponent$$$() {
         return jPanel3;
     }
+
 }

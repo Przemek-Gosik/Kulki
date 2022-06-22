@@ -1,37 +1,55 @@
 import javax.persistence.*;
 
 public class DBOperations {
-    EntityManagerFactory managerFactory;
-    EntityManager manager;
-    User user;
-    public DBOperations() {
+    private static DBOperations dbOperations;
 
-            managerFactory = Persistence.createEntityManagerFactory("Hibernate_JPA");
-            manager = managerFactory.createEntityManager();
-
+    public EntityManagerFactory getManagerFactory() {
+        return managerFactory;
     }
 
-    public static void addToDatabase(Object object ){
-        EntityManagerFactory managerFactory= Persistence.createEntityManagerFactory("Hibernate_JPA");
+    public void setManagerFactory(EntityManagerFactory managerFactory) {
+        this.managerFactory = managerFactory;
+    }
+
+    private EntityManagerFactory managerFactory;
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    private User user;
+
+
+    private DBOperations(EntityManagerFactory managerFactory1) {
+        this.managerFactory = managerFactory1;
+    }
+    public static DBOperations getInstance(EntityManagerFactory managerFactory1){
+        if(dbOperations == null){
+            dbOperations = new DBOperations(managerFactory1);
+        }
+        return dbOperations;
+    }
+
+    public void addToDatabase(Object object ){
         EntityManager manager=managerFactory.createEntityManager();
         manager.getTransaction().begin();
         manager.persist(object);
         manager.getTransaction().commit();
         manager.close();
-        managerFactory.close();
     }
-    public static void updateUser(User user,Result result){
-        EntityManagerFactory managerFactory= Persistence.createEntityManagerFactory("Hibernate_JPA");
+    public  void updateUser(User user,Result result){
         EntityManager manager=managerFactory.createEntityManager();
         manager.getTransaction().begin();
         user.addResult(result);
         manager.merge(user);
         manager.getTransaction().commit();
         manager.close();
-        managerFactory.close();
     }
-    public static void  changeLogin(User user,String newLogin){
-        EntityManagerFactory managerFactory= Persistence.createEntityManagerFactory("Hibernate_JPA");
+    public void  changeLogin(User user,String newLogin){
         EntityManager manager=managerFactory.createEntityManager();
         manager.getTransaction().begin();
         user.setUsername(newLogin);
@@ -40,8 +58,7 @@ public class DBOperations {
         manager.close();
         managerFactory.close();
     }
-    public static void deleteAccount(Long userId){
-        EntityManagerFactory managerFactory= Persistence.createEntityManagerFactory("Hibernate_JPA");
+    public void deleteAccount(Long userId){
         EntityManager manager=managerFactory.createEntityManager();
         manager.getTransaction().begin();
         User user =manager.find(User.class,userId);
@@ -50,28 +67,25 @@ public class DBOperations {
         manager.close();
     }
     public  boolean validateLogin(String userName, String password){
+        EntityManager manager = managerFactory.createEntityManager();
         manager.getTransaction().begin();
         Query query = manager.createQuery("SELECT u FROM User u where u.username=:userName AND u.password=:password");
         query.setParameter("userName",userName);
         query.setParameter("password",password);
+
             try {
-                user = (User) query.getSingleResult();
+                this.user=(User) query.getSingleResult();
+                manager.getTransaction().commit();
+                manager.close();
+                return true;
             }catch(NoResultException e ){
+               return false;
             }
-            manager.getTransaction().commit();
-            manager.close();
-                if(user == null){
-                    return false;
-                }else {
-                    return true;
-                }
 
 
 
 
 
     }
-    public User getUser(){
-        return this.user;
-    }
+
 }
