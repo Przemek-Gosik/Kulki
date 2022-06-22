@@ -1,13 +1,16 @@
-import javax.persistence.EntityManager;
+
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.swing.*;
-import java.awt.*;
+
 
 public class Main {
     public static void main(String[] args) {
+        EntityManagerFactory managerFactory = Persistence.createEntityManagerFactory("Hibernate_JPA");
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> managerFactory.close()));
        JFrame frame = new JFrame("Witaj w grze !");
-       Login login = new Login(frame);
+       frame.setLocationRelativeTo(null);
+       new Login(frame,managerFactory);
 
 
 

@@ -1,9 +1,8 @@
+import javax.persistence.EntityManagerFactory;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+
 
 public class DifficultChoice {
     private JRadioButton easyRadioButton;
@@ -17,10 +16,16 @@ public class DifficultChoice {
         return jpanel2;
     }
 
+    private JFrame jFrame;
     private JPanel jpanel2;
     private Level choice;
+    private final EntityManagerFactory managerFactory;
+    private User user;
 
-    public DifficultChoice(User user) {
+    public DifficultChoice(JFrame jFrame1, User user, EntityManagerFactory managerFactory1) {
+        this.jFrame = jFrame1;
+        this.user = user;
+        this.managerFactory = managerFactory1;
         veryEasyRadioButton.setSelected(true);
         choice = Level.VeryEasy;
         ButtonGroup buttonGroup = new ButtonGroup();
@@ -29,66 +34,49 @@ public class DifficultChoice {
         buttonGroup.add(mediumRadioButton);
         buttonGroup.add(hardRadioButton);
         buttonGroup.add(veryHardRadioButton);
-        veryEasyRadioButton.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                int state = e.getStateChange();
-                if (state == ItemEvent.SELECTED) {
-                    choice = Level.VeryEasy;
-                }
+        veryEasyRadioButton.addItemListener(e -> {
+            int state = e.getStateChange();
+            if (state == ItemEvent.SELECTED) {
+                choice = Level.VeryEasy;
             }
         });
-        easyRadioButton.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                int state = e.getStateChange();
-                if (state == ItemEvent.SELECTED) {
-                    choice = Level.Easy;
-                }
+        easyRadioButton.addItemListener(e -> {
+            int state = e.getStateChange();
+            if (state == ItemEvent.SELECTED) {
+                choice = Level.Easy;
             }
         });
-        mediumRadioButton.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                int state = e.getStateChange();
-                if (state == ItemEvent.SELECTED) {
-                    choice = Level.Medium;
-                }
+        mediumRadioButton.addItemListener(e -> {
+            int state = e.getStateChange();
+            if (state == ItemEvent.SELECTED) {
+                choice = Level.Medium;
             }
         });
-        hardRadioButton.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                int state = e.getStateChange();
-                if (state == ItemEvent.SELECTED) {
-                    choice = Level.Hard;
-                }
+        hardRadioButton.addItemListener(e -> {
+            int state = e.getStateChange();
+            if (state == ItemEvent.SELECTED) {
+                choice = Level.Hard;
             }
         });
-        veryHardRadioButton.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                int state = e.getStateChange();
-                if (state == ItemEvent.SELECTED) {
-                    choice = Level.VeryHard;
-                }
+        veryHardRadioButton.addItemListener(e -> {
+            int state = e.getStateChange();
+            if (state == ItemEvent.SELECTED) {
+                choice = Level.VeryHard;
             }
         });
-        startGameButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JFrame frame = new JFrame("Moje okno!");
-                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                Panel panel = new Panel(choice, user);
-                frame.getContentPane().add(panel);
-                frame.setPreferredSize(new Dimension(800, 600));
-                frame.pack();
-                frame.setLocationRelativeTo(null);
-                panel.setFocusable(true);
-                panel.requestFocus();
-                frame.setResizable(false);
-                frame.setVisible(true);
-            }
+        startGameButton.addActionListener(e -> {
+            this.jFrame.dispose();
+            JFrame frame = new JFrame("Moje okno!");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            Panel panel = new Panel(frame, choice, user, managerFactory);
+            frame.getContentPane().add(panel);
+            frame.setPreferredSize(new Dimension(800, 600));
+            frame.pack();
+            frame.setLocationRelativeTo(null);
+            panel.setFocusable(true);
+            panel.requestFocus();
+            frame.setResizable(false);
+            frame.setVisible(true);
         });
 
 
@@ -140,4 +128,5 @@ public class DifficultChoice {
     public JComponent $$$getRootComponent$$$() {
         return jpanel2;
     }
+
 }

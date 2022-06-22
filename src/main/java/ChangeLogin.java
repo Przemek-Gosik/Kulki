@@ -1,3 +1,4 @@
+import javax.persistence.EntityManagerFactory;
 import javax.swing.*;
 import java.awt.*;
 
@@ -13,14 +14,18 @@ public class ChangeLogin {
     }
 
     private JPanel changeLogin;
+    private final EntityManagerFactory managerFactory;
 
-    public ChangeLogin(JFrame jFrame, User user) {
+    public ChangeLogin(JFrame jFrame, User user, EntityManagerFactory managerFactory1) {
         this.jFrame = jFrame;
+        this.managerFactory = managerFactory1;
         acceptNewLoginButton.addActionListener(e -> {
             String newLogin;
             newLogin = textField1.getText();
+            DBOperations operations;
             try {
-                DBOperations.changeLogin(user, newLogin);
+                operations = DBOperations.getInstance(managerFactory);
+                operations.changeLogin(user, newLogin);
                 JOptionPane.showMessageDialog(new JFrame(),
                         "Dokonano zmiany loginu", "Sukces", JOptionPane.INFORMATION_MESSAGE);
             } catch (Exception exception) {
@@ -29,18 +34,15 @@ public class ChangeLogin {
 
 
         });
-        backToFirstMenuButton.addActionListener(e -> {
-
-            FirstMenu firstMenu = new FirstMenu(jFrame, user);
-
-        });
+        backToFirstMenuButton.addActionListener(e -> new FirstMenu(jFrame, user, managerFactory));
         deleteAccountButton.addActionListener(e -> {
-
-            DBOperations.deleteAccount(user.getId());
+            DBOperations operations;
+            operations = DBOperations.getInstance(managerFactory);
+            operations.deleteAccount(user.getId());
             JOptionPane.showMessageDialog(new JFrame(),
                     "Usunięto użytkownika", "Sukces", JOptionPane.INFORMATION_MESSAGE);
             jFrame.getContentPane().removeAll();
-            Login login = new Login(jFrame);
+            new Login(jFrame, managerFactory);
 
         });
 
@@ -116,4 +118,5 @@ public class ChangeLogin {
     public JComponent $$$getRootComponent$$$() {
         return changeLogin;
     }
+
 }

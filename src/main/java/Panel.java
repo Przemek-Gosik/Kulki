@@ -1,11 +1,14 @@
+import javax.persistence.EntityManagerFactory;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Panel extends JPanel {
+    private JFrame jFrame;
     private User user;
     private Setting setting;
     private ArrayList<Ball> listaKul;
@@ -17,19 +20,26 @@ public class Panel extends JPanel {
     private Level level;
     public int score=0;
     private final int DELAY = 22;
+    private EntityManagerFactory managerFactory;
 
-    public Panel(Level level,User user) {
+    public Panel(JFrame jFrame1,Level level,User user,EntityManagerFactory managerFactory1) {
+        this.jFrame=jFrame1;
         this.level=level;
         this.user=user;
+        this.managerFactory=managerFactory1;
         setting=new Setting(level);
         listaKul = new ArrayList<>();
         for(int i=0;i<setting.getNumberOfBalls();i++) {
-            Ball ball = new Ball(120+(i*80), 450, 20, -2, -10);
+            int min = 50+100*i;
+            int max = 100+100*i;
+            int randomNum = ThreadLocalRandom.current().nextInt(min,(min+max));
+            Ball ball = new Ball(randomNum, 450, 20, -2, -10);
             listaKul.add(ball);
         }
         listaProst = new ArrayList<>();
         for (int i=0;i<setting.getNumberOfRows();i++) {
             for (int j = 0; j < 14; j++) {
+
                 listaProst.add(new Rectangle(50 + (50 * j), 20+(50*i), 30, 30, Color.BLUE));
             }
         }
@@ -66,9 +76,7 @@ public class Panel extends JPanel {
     }
     private void endgame(){
         timeEnd=System.currentTimeMillis();
-
         float time = (float)(timeEnd-timeStart)/(float) 1000.0;
-
         DateTimeFormatter dtf=DateTimeFormatter.ofPattern("yyy/MM/dd HH:mm:ss");
         LocalDateTime dateTime = LocalDateTime.now();
         String date=dtf.format(dateTime);
@@ -76,7 +84,7 @@ public class Panel extends JPanel {
         JFrame frame = new JFrame("Koniec!");
         int numer = user.getResults().size();
         Result result = new Result(numer,date,score,max,level,time);
-        FinalMenu menu = new FinalMenu(result,user,frame);
+        FinalMenu menu = new FinalMenu(frame,result,user,managerFactory,jFrame);
         frame.setContentPane(menu.getjPanel3());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Dimension dimension = new Dimension(400, 200);
